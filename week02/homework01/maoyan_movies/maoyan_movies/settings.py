@@ -68,6 +68,11 @@ HTTP_PROXY_LIST = [
      'http://117.69.168.166:41185'
      'http://58.253.149.131:9999',
      'http://217.116.62.180:80',
+     'http://88.198.50.103:3128',
+     'http://119.180.129.107:8060',
+     'http://45.77.33.214:3128',
+     'http://58.220.95.79:10000',
+     'http://88.198.50.103:3128',
 ]
 
 # Enable or disable extensions
@@ -78,9 +83,9 @@ HTTP_PROXY_LIST = [
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'maoyan_movies.pipelines.MaoyanMoviesPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'maoyan_movies.pipelines.MaoyanMoviesPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

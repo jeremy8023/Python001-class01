@@ -9,6 +9,9 @@
     2.用scrapy访问https://maoyan.com/films?showType=3，获得response对象(maoyan.py -> start_requests())
     3.用Selector选择前10个的电影名称、类型和上映时间(maoyan.py -> parse())
     4.连接数据库maoyan，并存储到movie_info表中(未完成)
+    # values = [(id,'testuser'+str(id)) for id in range(4, 21) ]
+    # cursor.executemany('INSERT INTO '+ TABLE_NAME +' values(%s,%s)' ,values)
+
 '''
 
 import scrapy
@@ -31,16 +34,36 @@ class MaoyanSpider(scrapy.Spider):
     def parse(self, response):
         #拿到第一页所有电影的对象
         movies = Selector(response=response).xpath('//div[@class="movie-hover-info"]')
+        print(response.status)
+        print(response)
         #选择前10个电影对象
         for movie in movies[:2]:
+            # 存放movie_info的列表
+            movie_info = {}
             #得到movie_names
             movie_name = movie.xpath('./div[1]/span[1]/text()').extract()[0]
+            #movie_info.append(movie_name)
+            movie_info['name'] = movie_name
             #得到movie_types
             movie_type = movie.xpath('./div[@class="movie-hover-title"][2]/text()').extract()[1].strip()
+            #movie_info.append(movie_type)
+            movie_info['type'] = movie_type
             #得到movie_release
             movie_release = movie.xpath('./div[@class="movie-hover-title movie-hover-brief"]/text()').extract()[1].strip()
-            
-        print("-"*10)
+            #movie_info.append(movie_release)
+            movie_info['release'] = movie_release
+            # #将movie_info转换为元组对象，方便以后存入数据库
+            # trans_movie_info = tuple(movie_info)
+            # #添加每一个movie_info
+            # movieslist.append(trans_movie_info)
+            # print(movie_info)
+            # yield一个字典对象
+            yield movie_info
+
+
+
+        
+
 
 
 
