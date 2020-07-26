@@ -8,7 +8,7 @@
 from scrapy import signals
 #导入继承的HttpProxyMiddleware父类对象
 from scrapy.downloadermiddlewares.httpproxy import HttpProxyMiddleware
-#导入NotConfigured一场类
+#导入NotConfigured异常类
 from scrapy.exceptions import NotConfigured
 #导入字典对象
 from collections import defaultdict

@@ -45,6 +45,7 @@ class MaoyanSpider(scrapy.Spider):
             #movie_info.append(movie_name)
             movie_info['name'] = movie_name
             #得到movie_types
+            # extract()将selector对象转换为list对象，之后可作为列表操作
             movie_type = movie.xpath('./div[@class="movie-hover-title"][2]/text()').extract()[1].strip()
             #movie_info.append(movie_type)
             movie_info['type'] = movie_type
