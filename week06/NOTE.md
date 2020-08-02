@@ -82,6 +82,11 @@ Django = 2.2.13\
 # Django简要介绍
 Django是一组开发Web应用程序的框架，用Python编写完成。能够快速相应网页请求，轻松读写数据库和管理用户等。
 
+# Django创建项目、App和启动
+1. `django-admin startproject project_name . `
+2. `python manage.py startapp app_name`
+3. `python manage.py runserver IP:Prot`
+
 # Django.settings主要配置
 ## INSTALLED_APPS添加APP
 一个app完成一个web功能
@@ -106,7 +111,9 @@ Django是一组开发Web应用程序的框架，用Python编写完成。能够�
 ```
 
 ## LANGUAGE_CODE和TIME_ZONE
-时区和语言相关设置
+`LANGUAGE_CODE = 'zh-hans'`
+
+`TIME_ZONE = 'Asia/Shanghai'`
 
 # Django的路由分发
 1. 从project/urls.py中分发路由到每个App的urld.py中；
@@ -186,6 +193,8 @@ python manage.py migrate
 ```
 1. 将元数据转化为sql语言，生成sql语言文件
 2. sql语言commit到数据库中，存储在数据库中
+3. 执行这两条是需要迁移额外的管理django的数据表
+
 ## ORM_API：一定要注意字符集
 > from index.models import *
 ### 增加
@@ -214,7 +223,7 @@ filter支持更多查询条件
 filter(name=xxx, id=yyy)
 ## 数据库->ORM对象
 ```
-python manage.py inspectdb > models.py
+python manage.py inspectdb > app_name/models.py
 ```
 Mate类是一个元数据类，与数据表无关。
 `managed = False`是为了防止数据出错设置的。
@@ -261,7 +270,7 @@ re_path('(?P<year>[0-9]{4}).html', views.myyear, name='urlyear')
 name参数等价于匹配到的url，方便后续程序使用，用于解耦
 
 2. 解决Django和mysql连接的问题
-1  django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module: No module named 'MySQLdb'
+1 django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module: No module named 'MySQLdb'
 解决方法：在 __init__.py 文件中添加以下代码即可
 import pymysql
 pymysql.install_as_MySQLdb()
