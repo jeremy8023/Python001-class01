@@ -6,6 +6,44 @@
     <title>ShowMoviesInfo</title>
 </head>
 <body>
-    <h1>存储电影总数为{{ count_movies_item }}条，其中3星级以上（不包括3星级）为{{ gt_3_item }}条。展示如下：</h1>
+    <h1>存储电影总数为{{ count_movies_item }}条，其中3星级以上（不包括3星级）为{{ gt_3_item_counter }}条。展示如下：</h1>
+    <!-- <tr></tr>:行标签
+    <td></td>:列标签 -->
+    <table>
+        <tr>
+            <th>短评</th>
+            <th>星级</th>
+        </tr>
+        <tr>
+            <td >
+                {% for short in shorts %}
+                    {{ short }}<br><br>
+                {% endfor %}    
+            </td >
+            <td>
+                {% for grade in grades %}
+                    {{ grade }}<br><br>
+                {% endfor %}
+            </td >
+        </tr>
+        </table>
+        
+    <!-- {% for item in items %}
+        <div >
+            {{ item }}<br><br>
+        </div >
+    {% endfor %}
+    <hr>
+    {% for short in shorts %}
+        <div >
+            {{ short }}<br><br>
+        </div >
+    {% endfor %}
+    <hr>
+    {% for grade in grades %}
+        <div >
+            {{ grade }}<br><br>
+        </div >
+    {% endfor %} -->
 </body>
 </html>
