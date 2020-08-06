@@ -4,10 +4,9 @@
 
 ## 2.具体要求
 1. 定义“动物”、“猫”、“动物园”三个类，动物类不允许被实例化；
-2. 动物类要求定义“类型”、“体型”、“性格”、“是否属于凶猛动物”四个属性，是否属于凶猛动物的标准是：“体型>=中等”并且是“食肉类型”同时“性格凶猛”；
-3. 猫类要求定义“叫声”、“是否合适作为宠物”以及“名字”三个属性，其中“叫声”作为类属性，猫类继承自动物类；
-4. 动物园类要求有“名字”的属性和“添加动物”的方法，“添加动物”方法要实现同一种动物（同一个动物实例）不能被重复添加。
-
+2. 动物园类要求有“名字”的属性和“添加动物”的方法，“添加动物”方法要实现同一种动物（同一个动物实例）不能被重复添加。
+3. 动物类要求定义“类型”、“体型”、“性格”、“是否属于凶猛动物”四个属性，是否属于凶猛动物的标准是：“体型>=中等”并且是“食肉类型”同时“性格凶猛”；
+4. 猫类要求定义“叫声”、“是否合适作为宠物”以及“名字”三个属性，其中“叫声”作为类属性，猫类继承自动物类；
 ## 3.测试
 ```
 if __name__ == "__main__":
@@ -20,6 +19,7 @@ if __name__ == "__main__":
     # 判断动物园是否有cat1这只猫
     hava_cat = getattr(z, 'Cat')
 ```
+
 # 一、一切皆对象（类）
 1. self参数表示类的实例，指向当前实例的内存地址；
 ```
@@ -105,13 +105,6 @@ def pre_name(obj,name):
 me2 = pre_name(Kls2, 'wilson-yin')
 me2.print_name()
 ```
-### 应用
-[Python 中的 classmethod 和 staticmethod 有什么具体用途？
-](https://www.zhihu.com/question/20021164)
-1. 构造前交互
-2. 特殊的构造函数
-3. __new__等
-4. 为以上函数提供子类hook点
 
 ### 语法
 至少一个cls参数，表示该方法的类。要添加语法糖@classmethod.
@@ -120,6 +113,7 @@ class Story(object):
     snake = 'Python'
     def __init__(self, name):
         self.name = name
+
     # 类方法
     @classmethod
     def get_apple_to_eve(cls):
@@ -132,6 +126,13 @@ print(Story.get_apple_to_eve())
 ```
 类方法可以被类直接调用，也可以被实例化调用。
 
+### 应用
+[Python 中的 classmethod 和 staticmethod 有什么具体用途？
+](https://www.zhihu.com/question/20021164)
+1. 构造前交互
+2. 特殊的构造函数
+3. __new__等
+4. 为以上函数提供子类hook点
 
 ## 3.静态方法
 ### 应用
@@ -143,14 +144,337 @@ print(Story.get_apple_to_eve())
 有语法糖的方法（静态&类方法）都可以直接被类调用，而普通方法只能被实例化对象调用。
 
 
-# 五、属性的处理
-1. __getattribute__()和__getattr__()
-相同：都可以对实例属性进行获取&拦截
-差异：前者对所有属性的访问都调用该方法，后者设适用于未定义的属性
+# 五、属性的处理__getattribute__() & __getattr__()
+## 区别和联系
+1. 联系：都可以对实例属性进行获取&拦截
+2. 差异：前者对所有属性的访问都调用该方法，后者设适用于未定义的属性
+## __getattribute__
+```
+class Human2(object):  
+    """
+    getattribute对任意读取的属性进行截获
+    """  
+    def __init__(self):
+        self.age = 18
+    # 固定写法
+    def __getattribute__(self,item):
+        print(f' __getattribute__ called item:{item}')
 
-# 六、面向对象编程
+h1 = Human2()
+h1.age      # 属性存在
+h1.noattr   # 属性不存在
+```
+getattribute对任意读取的属性进行截获，所有属性均会调用__getattribute__方法
+```
+class Human2(object):  
+    """
+    拦截已存在的属性
+    """  
+    def __init__(self):
+        self.age = 18
+    def __getattribute__(self,item):
+        print(f' __getattribute__ called item:{item}')
+        # 用父类方法实现属性拦截。若存在，则返回；若不存在，则抛出异常
+        return super().__getattribute__(item)
+h1 = Human2()
 
-# 七、SOLID设计原则与设计模式
+# 存在的属性返回取值
+print(h1.age)
+# 不存在的属性返回 AttributeError
+print(h1.noattr)
+```
+用父类方法实现属性拦截。若存在，则返回；若不存在，则抛出异常.
+```
+class Human2(object):    
+    def __getattribute__(self, item):
+        """
+        将不存在的属性设置为100并返回,模拟getattr行为
+        """
+        print('Human2:__getattribute__')
+        try:
+            return super().__getattribute__(item)
+        except Exception as e:
+            # __dict__是存储属性的字典，如果没有该属性，则添加到dict
+            self.__dict__[item] = 100
+            return 100
+h1 = Human2()
+print(h1.noattr)
+```
+可以模拟__getattr__实现返回特定值。
+## __getattr__
+```
+class Human2(object):  
+    """
+    属性不在实例的__dict__中,__getattr__被调用
+    """
+    def __init__(self):
+        self.age = 18
+
+    def (self, item): 
+        print(f' __getattr__ called item:{item}')
+        # 不存在的属性返回默认值 'OK'
+        return 'OK'
+
+h1 = Human2()
+
+print(h1.age)
+print(h1.hobby)
+```
+处理所有属性的返回值
+```
+class Human2(object):  
+    def __init__(self):
+        self.age = 18
+
+    def __getattr__(self, item): 
+        # 对指定属性做处理:fly属性返回'superman',其他属性返回None
+        self.item = item
+        if self.item == 'fly':
+            return 'superman'
+h1 = Human2()
+
+print(h1.age)
+print(h1.fly)
+print(h1.noattr)
+```
+处理指定属性的返回值
+
+## 两者的调用顺序
+```
+class Human2(object):    
+    """
+    同时存在的调用顺序
+    """
+    def __init__(self):
+        self.age = 18
+    def __getattr__(self, item): 
+        print('Human2:__getattr__')
+        return 'Err 404 ,你请求的参数不存在'
+    def __getattribute__(self, item):
+        print('Human2:__getattribute__')
+        return super().__getattribute__(item)
+h1 = Human2()
+
+# 存在的属性用getattribute处理
+print(h1.age)
+# 如果属性不存在。如果同时两个函数存在
+# 执行顺序是 __getattribute__ > __getattr__ > __dict__
+print(h1.noattr)
+```
+属性若存在，用getattribute处理；
+如果属性不存在。如果同时两个函数存在。执行顺序是__getattribute__ > __getattr__。如果还找不到，就去 __dict__字典中查找。
+
+# 六、描述器原理 & 属性描述符
+## 描述器Property
+实现特定协议（描述符）的类，也就是说，property必须要基于一个类实现。描述器Property需要实现__get__()、__set__()、__delete__()方法。
+1. get：得到类，也就是实例化类时，执行的方法；
+2. set：修改类，也就是修改实例化类，执行的方法；
+3. delete：删除类，也就是删除实例化类，执行的方法
+```
+# __getattribute__ 的底层原理是描述器
+class Desc(object):
+    """
+    通过打印来展示描述器的访问流程
+    """
+    def __init__(self, name):
+        self.name = name
+    # 实例化时，调用函数。第二个参数：实例化对象地址；第三个参数：实例化的类
+    def __get__(self, instance, owner):
+        print(f'__get__{instance} {owner}')
+        return self.name
+
+    def __set__(self, instance, value):
+        print(f'__set__{instance} {value}')
+        self.name = value
+
+    def __delete__(self, instance):
+        print(f'__delete__{instance}')
+        del self.name
+
+class MyObj(object):
+    # 实例化两个Desc对象
+    a = Desc('aaa')
+    b = Desc('bbb')
+
+# 实例化MyObj对象
+my_object = MyObj()
+print(my_object.a)
+# 修改对象属性
+my_object.a = 456
+print(my_object.a)
+```
+
+## 描述器Property优点
+1 代码更简洁，可读性、可维护性更强。
+2 更好的管理属性的访问。
+3 控制属性访问权限，提高数据安全性。
+
+## 描述器的高层实现
+```
+class Human2(object):
+    def __init__(self):
+        self._gender = None
+    # 将方法封装成属性
+    @property
+    def gender2(self):
+        print(self._gender)
+    # 支持修改，固定写法，当执行修改操作，就调用该方法
+    @gender2.setter
+    def gender2(self,value):
+        self._gender = value
+    # 支持删除，固定写法，当执行删除操作，就调用该方法
+    @gender2.deleter
+    def gender2(self):
+        del self._gender
+h = Human2()
+# 返回None
+h.gender2
+# 修改
+h.gender2 = 'F'
+# 返回‘F’
+h.gender2
+# 删除
+del h.gender2
+```
+另一种property写法:
+```
+gender  = property(get_, set_, del_, 'other property')
+
+```
+## 纯Python实现property
+```
+class Property(object):
+    "Emulate PyProperty_Type() in Objects/descrobject.c"
+    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+        self.fget = fget
+        self.fset = fset
+        self.fdel = fdel
+        if doc is None and fget is not None:
+            doc = fget.__doc__
+            self.__doc__ = doc
+    
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        if self.fget is None:
+            raise AttributeError("unreadable attribute")
+        return self.fget(obj)
+
+    def __set__(self, obj, value):
+        if self.fset is None:
+            raise AttributeError("can't set attribute")
+        self.fset(obj, value)
+
+    def __delete__(self, obj):
+        if self.fdel is None:
+            raise AttributeError("can't delete attribute")
+        self.fdel(obj)
+
+    def getter(self, fget):
+        return type(self)(fget, self.fset, self.fdel, self.__doc__)
+
+    def setter(self, fset):
+        return type(self)(self.fget, fset, self.fdel, self.__doc__)
+
+    def deleter(self, fdel):
+        return type(self)(self.fget, self.fset, fdel, self.__doc__)
+```
+## property样例之一
+```
+class Age(object):
+    def __init__(self, default_age = 18):
+        self.age_range = range(18,66)
+        self.default_age = default_age
+        self.data = {}
+
+    def __get__(self, instance, owner):
+        return self.data.get(instance, self.default_age)
+    
+    def __set__(self, isinstance, value):
+        if value not in self.age_range:
+            raise ValueError('must be in (18-65)')
+
+        self.data[isinstance] = value
+
+class Student(object):
+    age = Age()
+
+if __name__ == '__main__':
+    s1 = Student()
+    s1.age = 30
+    s1.age = 100
+```
+## property样例之二
+```
+class Node(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    updated_at = db.Column(db.DateTime) # 节点最后心跳时间
+    state = db.Column(db.Integer, nullable=False) # 节点是否禁用
+
+    @property
+    def is_active(self):
+        if(datetime.datetime.now() - self.updated_at).secondes > 60 \
+            and self.vm_state == 0:
+            return False
+        return True
+```
+## property样例之三
+```
+from sqlalchemy import Column, Integer, String, Float
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from manage import db
+from werkzeug.security import generate_password_hash, check_password_hash
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), nullable=False, unique=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+
+# 使用装饰器完成password的读取和写入功能分离
+    @property
+    def password(self):
+        return None
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+  
+    def is_active(self):
+        return True
+```
+
+# 七、面向对象编程
+## 新式类和经典类的区别
+当前类/父类继承了object类，那么它是新式类。否则是经典类。
+## object和type的关系
+```
+#__class__查看谁创建了自己，__bases__查看自己的父类
+print('object：', object.__class__, object.__bases__)
+print('type：', type.__class__, type.__bases__)
+>>> object： <class 'type'> ()
+>>> type： <class 'type'> (<class 'object'>,)
+```
+1. object和type都属于type类；
+2. type类由type元类自身创建。object类是由元类type创建；
+3. object的父类是空，没有继承自任何类
+4. type的父类为object类
+## 类的继承
+广度优先，另外Python3中不加(object)也是新式类，但是为了代码不会误运行在python2下产生意外结果，仍然建议增加
+1. 单继承
+2. 多继承
+3. 菱形继承
+4. 继承机制MRO和C3算法
+class_name.mro()查看类的继承情况
+可以采用有向无环图解决多重继承的顺序问题。
+
+# 八、SOLID设计原则与设计模式
 ## SOLID设计原则
 1. 单一责任原则
 每个类完成一项任务。
@@ -228,7 +552,7 @@ class Singleton2(object):
 
 		return cls.__isinstance
 ```
-并在将一个类的实例绑定到类变量_instance上,
+将一个类的实例绑定到类变量_instance上,
 如果cls._instance为None说明该类还没有实例化过,实例化该类,并返回
 如果cls._instance不为None,直接返回cls._instance
 ---
