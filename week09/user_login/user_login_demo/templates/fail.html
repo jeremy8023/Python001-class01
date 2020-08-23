@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<p>登录失败，请输入正确的用户名和密码！</p>
+<form action="/login_demo" method="post">
+    {% csrf_token %}
+    <div>用户名：{{ form.user_name }}</div>
+    <br>
+    <div>密码：{{ form.passwd }}</div>
+    <br>
+    <input type="submit" value="登录">
+</form>
+</body>
+</html>
